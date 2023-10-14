@@ -1,13 +1,19 @@
 from word import *
+from config import *
 
 
 def preprocess_text(text):
-    clean_text = str(text).replace('"', '').replace(',', '').replace('.', '')  # ignore punctuation?
-    clean_text = clean_text.lower()  # ignore case?
+    if IGNORE_PUNCTUATION:
+        text = str(text).replace('"', '').replace(',', '').replace('.', '')  # ignore punctuation?
+    if IGNORE_CASE:
+        text = text.lower()  # ignore case?
+
+    clean_text = text
     return clean_text
 
 
-def postprocess_diff_list(diff_list):
+# metadata
+def parse_diff_list(diff_list):
     origin_index = 0
     sample_index = 0
     origin_words = list()

@@ -9,11 +9,11 @@ sample_text = "A woman was charged with allegedly violating a Rhode Island city 
 
 # diff
 differ = difflib.Differ()
-diff_list = list(differ.compare(sample_text.split(), origin_txt.split()))
+diff_list = list(differ.compare(preprocess_text(sample_text).split(), preprocess_text(origin_txt).split()))
 print(diff_list)  # ['  This', '  is', '- another', '+ a', '- example', '? ^^\n', '+ sample', '? ^\n', '  sentence.']
 
 # get metadata
-origin_words, sample_words = postprocess_diff_list(diff_list)
+origin_words, sample_words = parse_diff_list(diff_list)
 
 # correct
 corrected_words = correct(diff_list)
