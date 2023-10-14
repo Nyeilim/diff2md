@@ -1,20 +1,25 @@
 import difflib
 from utils import *
 
-origin_txt = "This is a sample sentence."
-corrective_text = "This is another example sentence."
+# example
+# origin_txt = "This is a sample sentence."
+# sample_text = "This is another example sentence."
+origin_txt = "a woman was charged allegedly Role Island city law against feeding animals."
+sample_text = "A woman was charged with allegedly violating a Rhode Island city law against feeding wild animals."
 
+# diff
 differ = difflib.Differ()
-diff_list = list(differ.compare(corrective_text.split(), origin_txt.split()))
+diff_list = list(differ.compare(sample_text.split(), origin_txt.split()))
 print(diff_list)  # ['  This', '  is', '- another', '+ a', '- example', '? ^^\n', '+ sample', '? ^\n', '  sentence.']
 
-print("------------------------")
+# get metadata
+origin_words, sample_words = postprocess_diff_list(diff_list)
 
-origin_words, corrective_words = postprocess_diff_list(diff_list)
-for one in origin_words:
-    print(one)
+# correct
+corrected_words = correct(diff_list)
 
-print("------------------------")
+# join
+corrected_text = gen_corrected_text(corrected_words)
 
-for one in corrective_words:
-    print(one)
+# print and paste to siyuan!
+print(corrected_text)

@@ -4,9 +4,10 @@ from enum import Enum, unique
 @unique
 class Source(Enum):
     ORIGIN = 0  # origin text
-    CORRECTIVE = 1  # corrective text
+    SAMPLE = 1  # sample text
 
 
+# the state origin text towards sample text
 @unique
 class State(Enum):
     MISS = 0
