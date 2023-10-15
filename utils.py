@@ -3,7 +3,7 @@ from config import *
 import difflib
 
 
-def preprocess_text(text):
+def preprocess(text):
     if IGNORE_PUNCTUATION:
         text = str(text).replace('"', '').replace(',', '').replace('.', '')  # ignore punctuation?
     if IGNORE_CASE:
@@ -13,16 +13,29 @@ def preprocess_text(text):
     return clean_text
 
 
+def process(origin_text, sample_text):
+    origin_lines = origin_text.split('\n\n')
+    sample_lines = sample_text.split('\n\n')
+    if len(origin_lines) != len(sample_lines):
+        return "Error: lines unmatched!"
+
+    corrected_lines = list()
+    for i in range(len(origin_lines)):
+        corrected_line = do_process(origin_lines[i], sample_lines[i])
+        corrected_lines.append(corrected_line)
+
+    return "\n\n".join(corrected_lines)
+
+
 def do_process(origin_line, sample_line):
     # diff
     differ = difflib.Differ()
-    diff_list = list(differ.compare(preprocess_text(sample_line).split(), preprocess_text(origin_line).split()))
+    diff_list = list(differ.compare(preprocess(sample_line).split(), preprocess(origin_line).split()))
 
     corrected_words = correct(diff_list)  # correct
-    corrected_text = gen_corrected_text(corrected_words)  # join
+    corrected_line = gen_corrected_line(corrected_words)  # join
 
-    return corrected_text
-
+    return corrected_line
 
 
 def correct(diff_list):
@@ -72,9 +85,11 @@ def sort_corrected_words(words):
                     and words[i - 2].state == State.REDUNDANT)):
             exchange_word(words, i, i - 1)
 
+    # TODO: final sort focus on 'miss' and 'redundant' chunk, let 'miss' always behind 'redundant'
+
 
 # Use win+v to paste to siyuan
-def gen_corrected_text(corrected_words):
+def gen_corrected_line(corrected_words):
     return " ".join(word.content for word in corrected_words).replace("~~ ~~", " ").replace("== ==", " ")
 
 

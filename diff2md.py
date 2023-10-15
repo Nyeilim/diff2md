@@ -17,7 +17,7 @@ root.grid_columnconfigure(0, weight=1)
 
 # button style
 style = ttk.Style()
-style.configure("TButton", padding=6, font=("Arial", 12))
+style.configure("TButton", padding=5, font=("Arial", 12))
 
 # passed param
 comp = Component()
