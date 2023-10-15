@@ -1,25 +1,39 @@
-import difflib
-from utils import *
+import tkinter as tk
+from tkinter import ttk
+from uicontrol import *
+from entity.component import *
 
-# example
-# origin_txt = "This is a sample sentence."
-# sample_text = "This is another example sentence."
-origin_txt = "a woman was charged allegedly Role Island city law against feeding animals."
-sample_text = "A woman was charged with allegedly violating a Rhode Island city law against feeding wild animals."
+# create main window
+root = tk.Tk()
+root.title("Text Correction")
 
-# diff
-differ = difflib.Differ()
-diff_list = list(differ.compare(preprocess_text(sample_text).split(), preprocess_text(origin_txt).split()))
-print(diff_list)  # ['  This', '  is', '- another', '+ a', '- example', '? ^^\n', '+ sample', '? ^\n', '  sentence.']
+# create text box
+text_box = tk.Text(root, wrap=tk.WORD, width=40, height=10)
+text_box.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-# get metadata
-origin_words, sample_words = parse_diff_list(diff_list)
+# set layout
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
 
-# correct
-corrected_words = correct(diff_list)
+# button style
+style = ttk.Style()
+style.configure("TButton", padding=6, font=("Arial", 12))
 
-# join
-corrected_text = gen_corrected_text(corrected_words)
+# passed param
+comp = Component()
 
-# print and paste to siyuan!
-print(corrected_text)
+# create button
+next_button = ttk.Button(root, text="Next", command=lambda: next_step(comp), style="TButton")
+next_button.grid(row=1, column=0, padx=10, pady=10)
+
+process_button = ttk.Button(root, text="Process", command=lambda: process_text(comp), style="TButton")
+process_button.grid(row=1, column=0, padx=10, pady=10)
+process_button.grid_remove()  # hide after creating, then only see 'next' button when opening
+
+# capsule
+comp.text_box = text_box
+comp.next_button = next_button
+comp.process_button = process_button
+
+# run
+root.mainloop()

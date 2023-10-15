@@ -1,5 +1,6 @@
-from word import *
+from entity.word import *
 from config import *
+import difflib
 
 
 def preprocess_text(text):
@@ -12,36 +13,16 @@ def preprocess_text(text):
     return clean_text
 
 
-# metadata
-def parse_diff_list(diff_list):
-    origin_index = 0
-    sample_index = 0
-    origin_words = list()
-    sample_words = list()
+def do_process(origin_line, sample_line):
+    # diff
+    differ = difflib.Differ()
+    diff_list = list(differ.compare(preprocess_text(sample_line).split(), preprocess_text(origin_line).split()))
 
-    for one in diff_list:
-        content = str(one)[2:]
-        if str(one).startswith(' '):
-            # match
-            origin_words.append(Word(Source.ORIGIN, State.MATCH, origin_index, content))
-            sample_words.append(Word(Source.SAMPLE, State.MATCH, sample_index, content))
-            origin_index += 1
-            sample_index += 1
+    corrected_words = correct(diff_list)  # correct
+    corrected_text = gen_corrected_text(corrected_words)  # join
 
-        elif str(one).startswith('+'):
-            # redundant
-            origin_words.append(Word(Source.ORIGIN, State.REDUNDANT, origin_index, content))
-            origin_index += 1
+    return corrected_text
 
-        elif str(one).startswith('-'):
-            # miss
-            sample_words.append(Word(Source.SAMPLE, State.MISS, sample_index, content))
-            sample_index += 1
-        else:
-            # start with '?', diff, do nothing
-            pass
-
-    return origin_words, sample_words
 
 
 def correct(diff_list):
