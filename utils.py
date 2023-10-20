@@ -30,8 +30,9 @@ def process(origin_text, sample_text):
 def do_process(origin_line, sample_line):
     # diff
     differ = difflib.Differ()
-    diff_list = list(differ.compare(preprocess(sample_line).split(), preprocess(origin_line).split()))
+    diff_list = list(differ.compare(sample_line.split(), origin_line.split()))
 
+    # TODO: preprocess
     corrected_words = correct(diff_list)  # correct
     corrected_line = gen_corrected_line(corrected_words)  # join
 
@@ -70,7 +71,19 @@ def sort_corrected_words(words):
     for i in range(1, len(words)):
         if (words[i - 1].state == State.MISS
                 and words[i].state == State.REDUNDANT):
-            exchange_word(words, i, i - 1)
+            red_start = red_end = i
+            miss_end = miss_start = i - 1
+
+            # try find consecutive REDUNDANT and MISS area
+            while red_end + 1 < len(words) \
+                    and words[red_end + 1].state == State.REDUNDANT:
+                red_end = red_end + 1
+            while miss_start - 1 >= 0 \
+                    and words[miss_start - 1].state == State.MISS:
+                miss_start = miss_start - 1
+
+            # exchange
+            exchange_words(words, miss_start, miss_end, red_start, red_end)
 
     # second, make words which are the same state together
     # main focus "miss redundant miss" and "redundant miss redundant" two types
@@ -85,23 +98,24 @@ def sort_corrected_words(words):
                     and words[i - 2].state == State.REDUNDANT)):
             exchange_word(words, i, i - 1)
 
-    # TODO: final sort focus on 'miss' and 'redundant' chunk, let 'miss' always behind 'redundant'
-
 
 # Use win+v to paste to siyuan
 def gen_corrected_line(corrected_words):
     return " ".join(word.content for word in corrected_words).replace("~~ ~~", " ").replace("== ==", " ")
 
 
-# Warning: be sure the index i1/i2 are valid
+# Warning: be sure the index i1/i2 are valid and consecutive
 def exchange_word(words, i1, i2):
-    # content change
-    tmp = words[i1]
-    words[i1] = words[i2]
-    words[i2] = tmp
-    # index update
-    words[i1].index = i1
-    words[i2].index = i2
+    exchange_words(words, i1, i1, i2, i2)
+
+
+# exchange the [start1, end1] and [start2, end2]
+# index order: start1 < end1 < start2 < end2; and index are consecutive
+def exchange_words(words, start1, end1, start2, end2):
+    words[start2:end2 + 1], words[start1:end1 + 1] \
+        = words[start1:end1 + 1], words[start2:end2 + 1]
+    for i in range(start1, end2 + 1):
+        words[i].index = i
 
 
 # Markdown highlight: ==test==
