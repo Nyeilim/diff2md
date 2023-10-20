@@ -3,14 +3,39 @@ from config import *
 import difflib
 
 
-def preprocess(text):
-    if IGNORE_PUNCTUATION:
-        text = str(text).replace('"', '').replace(',', '').replace('.', '')  # ignore punctuation?
-    if IGNORE_CASE:
-        text = text.lower()  # ignore case?
+def preprocess(diff_list):
+    diff_list = [one for one in diff_list if not one.startswith('?')]
 
-    clean_text = text
-    return clean_text
+    # TODO: how to preprocess when encounter '- The.' '+ the'
+    if IGNORE_PUNCTUATION:  # ignore punctuation? ignore , . "
+        def is_ignore_punctuation(origin, sample):
+            return origin + '.' == sample or origin + ',' == sample \
+                or '"' + origin == sample or origin + '"' == sample
+
+        diff_list = ignore_process(diff_list, is_ignore_punctuation)
+
+    if IGNORE_CASE:  # ignore case?
+        def is_ignore_case(origin, sample):
+            return origin.lower() == sample.lower()
+
+        diff_list = ignore_process(diff_list, is_ignore_case)
+
+    return diff_list
+
+
+def ignore_process(diff_list, ignore_rule):
+    for i in range(len(diff_list)):
+        if diff_list[i].startswith('-') \
+                and i + 1 < len(diff_list) \
+                and diff_list[i + 1].startswith('+') \
+                and ignore_rule(diff_list[i + 1][2:], diff_list[i][2:]):
+            # ignore, replace unmatched pair(like '- the', '+ The') to match content(like ' The')
+            content = str(diff_list[i])[2:]  # use sample content as standard content
+            match_prefix = "  "
+            diff_list[i: i + 2] = [match_prefix + content, '?']  # '?' just a placeholder, keep list.len not change
+
+    diff_list = [one for one in diff_list if not one.startswith('?')]
+    return diff_list
 
 
 def process(origin_text, sample_text):
@@ -32,7 +57,7 @@ def do_process(origin_line, sample_line):
     differ = difflib.Differ()
     diff_list = list(differ.compare(sample_line.split(), origin_line.split()))
 
-    # TODO: preprocess
+    diff_list = preprocess(diff_list)
     corrected_words = correct(diff_list)  # correct
     corrected_line = gen_corrected_line(corrected_words)  # join
 
