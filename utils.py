@@ -3,14 +3,18 @@ from config import *
 import difflib
 
 
-def preprocess(text):
-    if IGNORE_PUNCTUATION:
-        text = str(text).replace('"', '').replace(',', '').replace('.', '')  # ignore punctuation?
-    if IGNORE_CASE:
-        text = text.lower()  # ignore case?
+def preprocess(diff_list):
+    diff_list = [one for one in diff_list if not one.startswith('?')]
 
-    clean_text = text
-    return clean_text
+    if IGNORE_PUNCTUATION:  # ignore punctuation?
+        pass # TODO
+    if IGNORE_CASE:  # ignore case?
+        for i in range(len(diff_list)):
+            if diff_list[i].startswith('-') \
+                    and i + 1 < len(diff_list) \
+                    and diff_list[i + 1].startswith('+') \
+                    and diff_list[i].lower() == diff_list[i + 1].lower():
+                pass # TODO
 
 
 def process(origin_text, sample_text):
@@ -33,6 +37,7 @@ def do_process(origin_line, sample_line):
     diff_list = list(differ.compare(sample_line.split(), origin_line.split()))
 
     # TODO: preprocess
+    preprocess(diff_list)
     corrected_words = correct(diff_list)  # correct
     corrected_line = gen_corrected_line(corrected_words)  # join
 
