@@ -7,10 +7,12 @@ def preprocess(diff_list):
     diff_list = [one for one in diff_list if not one.startswith('?')]
 
     # only ignore punctuation
-    if IGNORE_PUNCTUATION and not IGNORE_CASE:  # ignore punctuation? ignore , . "
+    if IGNORE_PUNCTUATION and not IGNORE_CASE:  # ignore punctuation? ignore , . " ' - ?
         def is_ignore_punctuation(origin, sample):
             return str(origin).replace('"', "").replace('.', "").replace(',', "") \
-                   == str(sample).replace('"', "").replace('.', "").replace(',', "")
+                   .replace("'", "").replace('?', "").replace("-", " ") \
+                   == str(sample).replace('"', "").replace('.', "").replace(',', "") \
+                   .replace("'", "").replace('?', "").replace("-", " ")
 
         diff_list = ignore_process(diff_list, is_ignore_punctuation)
 
@@ -25,7 +27,9 @@ def preprocess(diff_list):
     if IGNORE_CASE and IGNORE_PUNCTUATION:
         def is_all_ignore(origin, sample):
             return str(origin).lower().replace('"', "").replace('.', "").replace(',', "") \
-                   == str(sample).lower().replace('"', "").replace('.', "").replace(',', "")
+                   .replace("'", "").replace('?', "").replace("-", " ") \
+                   == str(sample).lower().replace('"', "").replace('.', "").replace(',', "")\
+                   .replace("'", "").replace('?', "").replace("-", " ")
 
         diff_list = ignore_process(diff_list, is_all_ignore)
 
