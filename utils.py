@@ -2,7 +2,7 @@ from entity.word import *
 from config import *
 import difflib
 
-
+# TODO 如果句子里有两个 $ 会出问题, $abc$ \$abc\$ 均显示花体 \\$abc\\$ 显示正常, ==\$abc== 显示正常
 def preprocess(diff_list):
     diff_list = [one for one in diff_list if not one.startswith('?')]
 
