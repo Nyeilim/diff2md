@@ -1,4 +1,4 @@
-from utils import process
+from process import process
 
 
 def next_step(component):
