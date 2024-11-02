@@ -99,7 +99,3 @@ Applicants must be between 30 and 55 and in good physical health.
 ~~Altitude~~ =="Attitude== is key," said former Canadian astronaut ==Chris Hadfield.==
 
 He said the participants need to be super competent, resourceful, and not rely on other people to feel comfortable.
-
----
-## Corrected Text Rendered in Siyuan
-![](https://raw.githubusercontent.com/Nyeilim/image-hosting/main/share/202310201636924.png)
